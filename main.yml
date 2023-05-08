@@ -1,0 +1,7 @@
+---
+- name: Install LAMP server
+  hosts: lamp_servers
+  become: yes
+
+  roles:
+    - lamp

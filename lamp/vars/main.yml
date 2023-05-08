@@ -1,0 +1,9 @@
+---
+# vars file for lamp
+db_name: testdb
+db_user: admini
+db_user_password: toortoor 
+mysql_root: root
+mysql_root_password: toortoor
+mysql_host: localhost
+mysql_dump_file: "{{role_path}}/files/dump.sql"
