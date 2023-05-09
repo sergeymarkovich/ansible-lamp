@@ -1,41 +1,43 @@
 ---
 # task file for lamp
 
-# - name: Update apt cache
-#   apt:
-#     update_cache: yes
+- name: Update apt cache
+  apt:
+    update_cache: yes
 
-# - name: Install LAMP stack
-#   become: yes
-#   apt:
-#     name: "{{ item }}"
-#     state: latest
-#     update_cache: yes
-#   loop:
-#     - apache2
-#     - mysql-server
-#     - php, libapache2-mod-php, php-mysql, php-xml, php-gd, php-imap, php-mysql
-#     - python3-pip
+- name: Install LAMP stack
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - apache2
+    - mysql-server
+    - php, libapache2-mod-php, php-mysql, php-xml, php-gd, php-imap, php-mysql
+    - python3-pip
 
-# - name: Install mysql-connector-python
-#   pip:
-#     name: pymysql
-#     state: latest
-#   become: true
+- name: Install mysql-connector-python
+  pip:
+    name: pymysql
+    state: latest
+  become: true
 
+
+# ПЕРЕНЕСТИ В HANDLERS
 # - name: Restart Apache
 #   become: true
 #   systemd:
 #     name: apache2
 #     state: restarted
 
-# - name: Copy .my.cnf template file
-#   template:
-#     src: templates/.my.cnf.j2
-#     dest: /root/.my.cnf
-#     owner: root
-#     group: root
-#     mode: 0600
+- name: Copy .my.cnf template file
+  template:
+    src: templates/.my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
 
 - name: Change password for mysql root user
   mysql_user:
@@ -79,11 +81,11 @@
 #   debug:
 #     var: dump_file_stat
 
-# - name: Import table structure dump into testdb
-#   mysql_db:
-#     name: "{{ db_name }}"
-#     state: import
-#     target: "{{ mysql_dump_file }}"
-#     login_user: "{{ db_user }}"
-#     login_password: "{{ db_user_password }}"
+- name: Import table structure dump into testdb
+  mysql_db:
+    name: "{{ db_name }}"
+    state: import
+    target: "{{ mysql_dump_file }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_user_password }}"
 
