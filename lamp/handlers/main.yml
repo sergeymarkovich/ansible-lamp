@@ -1,2 +1,16 @@
 ---
 # handlers file for lamp
+- name: Stop Nginx
+  systemd:
+    name: nginx
+    state: stopped
+  listen: "Install LAMP stack"
+
+- name: Restart Apache
+  become: true
+  systemd:
+    name: apache2
+    state: restarted
+  listen: "Install mysql-connector-python"
+
+

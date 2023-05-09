@@ -3,33 +3,42 @@
 
 - name: Update apt cache
   apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Install LAMP stack
-  become: yes
+  become: true
   apt:
     name: "{{ item }}"
     state: latest
-    update_cache: yes
+    update_cache: true
   loop:
     - apache2
     - mysql-server
     - php, libapache2-mod-php, php-mysql, php-xml, php-gd, php-imap, php-mysql
     - python3-pip
+  # notify: "Stop Nginx"
 
 - name: Install mysql-connector-python
   pip:
     name: pymysql
     state: latest
   become: true
+  # notify: "Restart Apache"
 
 
-# ПЕРЕНЕСТИ В HANDLERS
-# - name: Restart Apache
-#   become: true
-#   systemd:
-#     name: apache2
-#     state: restarted
+# В HANDLERS
+- name: Stop Nginx service
+  become: true
+  systemd:
+    name: nginx
+    state: stopped
+
+# В HANDLERS
+- name: Manage Apache
+  become: true
+  systemd:
+    name: apache2
+    state: restarted
 
 - name: Copy .my.cnf template file
   template:
@@ -66,26 +75,22 @@
         priv: "*.*:ALL"
         state: present
 
-# - name: Установить права доступа на файл
-#   file:
-#     path: "{{mysql_dump_file}}"
-#     mode: "0777"
+- name: Copy table.sql to remote server
+  copy:
+    src: "{{mysql_dump_file_local}}"
+    dest: "{{mysql_file_remote}}"
 
-
-# - name: Проверить права доступа к файлу dump
-#   stat:
-#     path: "{{mysql_dump_file}}"
-#   register: dump_file_stat
-
-# - name: Вывести информацию о правах доступа к файлу dump
-#   debug:
-#     var: dump_file_stat
+- name: Copy dump.csv to remote server
+  copy:
+    src: "{{mysql_csv_file_local}}"
+    dest: "{{mysql_file_remote}}"
 
 - name: Import table structure dump into testdb
   mysql_db:
     name: "{{ db_name }}"
     state: import
-    target: "{{ mysql_dump_file }}"
+    target: "{{ mysql_dump_file_remote }}"
     login_user: "{{ db_user }}"
     login_password: "{{ db_user_password }}"
+  become: true
 
