@@ -1,0 +1,47 @@
+pipeline {
+  agent any
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/sergeymarkovich/ansible-lamp'
+      }
+    }
+    stage('Ansible LAMP Deploy') {
+      steps {
+        ansiblePlaybook([
+          colorized: true, 
+          credentialsId: 'ansible-priv',          
+          disableHostKeyChecking: true,
+          installation: 'ansible1',
+          inventory: 'inventory.ini',
+          playbook: 'main.yml'
+        ])
+      }
+    }
+    
+    stage('Check MySQL Table') {
+        steps {
+            script {
+                def sqlFile = "dump.csv"
+                def tableExists = sh(
+                    script: "mysql -u admini -ptoortoor -e \"USE testdb; SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'testdb' AND table_name = 'dump';\"",
+                    returnStdout: true
+                ).trim()
+                if (tableExists == "1") {
+                    echo "Table dump exists in testdb"
+                    sqlFile = "dump.sql"
+                } else {
+                    echo "Table dump does not exist in testdb"
+                    sqlFile = "table.sql"
+                }
+                sh(
+                    script: "mysql -u admini -ptoortoor testdb < ${sqlFile}",
+                    returnStatus: true
+                )
+            }
+        }
+    }
+    
+    
+}
+}
