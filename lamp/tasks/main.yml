@@ -47,6 +47,13 @@
     owner: root
     group: root
     mode: 0600
+  notify: Restart MySQL 
+
+- name: "UFW - Allow HTTP on port {{ http_port }}"
+  ufw:
+    rule: allow
+    port: "{{ http_port }}"
+    proto: tcp
 
 - name: Change password for mysql root user
   mysql_user:

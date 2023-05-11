@@ -4,13 +4,19 @@
   systemd:
     name: nginx
     state: stopped
-  listen: "Install LAMP stack"
+  # listen: "Install LAMP stack"
 
 - name: Restart Apache
   become: true
   systemd:
     name: apache2
     state: restarted
-  listen: "Install mysql-connector-python"
+  # listen: "Install mysql-connector-python"
+
+- name: Restart MySQL
+  service:
+    name: mysql
+    state: restarted
+
 
 
